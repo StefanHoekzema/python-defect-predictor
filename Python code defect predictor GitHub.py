@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
 import numpy as np
-import matplotlib.pyplot as plt
-import os
-import cv2
-import seaborn as sns
 import pandas as pd
 
 from sklearn.preprocessing import StandardScaler
@@ -15,24 +17,45 @@ from sklearn.svm import LinearSVR
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 # Define settings.
 useScaler = True
 verbose = 0
 
-DATADIR = "C:Users\shoekzem\Documents\TMAP literatuur\cats and dogs"
-CATEGORIES = ['Dog', 'Cat']
+df1 = pd.read_csv("corona.csv")
+df1.info()
+df1.head()
 
-for category in CATEGORIES:
-    path = os.path.join(DATADIR, category)
-    for img in os.listdir(path):
-        img_array = cv2.imread(os.path.join(path,img), cv2.IMREAD_GREYSCALE)
-        plt.imshow(img_array, cmap="gray")
-        plt.show()
-        break
-    break
+xs = df1[['New recovered']]
+ys = pd.Series(df1['New cases'])
 
-X = ['Dog']
-y = ['Cat']
+pd.to_numeric(ys)
+
+# let's visualize it
+plt.xlabel('New recovered')
+plt.ylabel('New cases')
+plt.scatter(xs,ys)
+
+# Split up the data set into the features and the labels.
+X = df1.drop('New cases', axis=1) # Remove the ___ label.
+y = df1['New cases'] # Only take out the ___ label.
+
+# Optionally drop features to see how this influences the result.
+X = X.drop('Date', axis=1)
+#X = X.drop('Confirmed', axis=1)
+#X = X.drop('Recovered', axis=1)
+#X = X.drop('Active', axis=1)
+#X = X.drop('New cases', axis=1)
+#X = X.drop('New deaths', axis=1)
+#X = X.drop('New recovered', axis=1)
+#X = X.drop('Deaths / 100 Cases', axis=1)
+#X = X.drop('Recovered / 100 Cases', axis=1)
+#X = X.drop('Deaths / 100 Recovered', axis=1)
+#X = X.drop('No. of countries', axis=1)
+
+
 
 # Split the data set up into a training and a test set. We can do whatever we want with the training set, but we may only use the test set once, to check the performance.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -63,4 +86,4 @@ def evaluateResults(title, model, Xt, Xv, yt, yv):
 model = LinearRegression() # Set up a regression model.
 model.fit(Xt, yt) # Train the model on the training data.
 evaluateResults('linear regression', model, Xt, Xv, yt, yv)
-    
+
